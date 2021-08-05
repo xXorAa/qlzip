@@ -80,39 +80,45 @@ char *getp(m, p, n)
 int newname(char *, int, int);
 
 #else /* !QDOS */
+
+#include <stdint.h>
+#include <assert.h>
+
 #define QDOS_FLMAX 36
 
 short qlflag = 0;
 
-struct qdirect  {
-    long            d_length __attribute__ ((packed));  /* file length */
-    unsigned char   d_access __attribute__ ((packed));  /* file access type */
-    unsigned char   d_type __attribute__ ((packed));    /* file type */
-    long            d_datalen __attribute__ ((packed)); /* data length */
-    long            d_reserved __attribute__ ((packed));/* Unused */
-    short           d_szname __attribute__ ((packed));  /* size of name */
-    char            d_name[QDOS_FLMAX] __attribute__ ((packed));/* name area */
-    long            d_update __attribute__ ((packed));  /* last update */
-    long            d_refdate __attribute__ ((packed));
-    long            d_backup __attribute__ ((packed));   /* EOD */
-    } ;
-#endif /* ?QDOS */
+#pragma pack(push,1)
+typedef struct {
+    int32_t         d_length;  /* file length */
+    uint8_t         d_access;  /* file access type */
+    uint8_t         d_type;    /* file type */
+    int32_t         d_datalen; /* data length */
+    int32_t         d_reserved;/* Unused */
+    int16_t         d_szname;  /* size of name */
+    int8_t          d_name[QDOS_FLMAX];/* name area */
+    int32_t         d_update;  /* last update */
+    int32_t         d_refdate;
+    int32_t         d_backup;   /* EOD */
+    } qdirect;
+#pragma pack(pop)
+
+#endif /* !QDOS */
 
 #define SHORTID 0x4afb          /* in big-endian order !! */
 #define LONGID  "QDOS02"
-#define EXTRALEN (sizeof(struct qdirect) + 8)
+#define EXTRALEN (sizeof(qdirect) + 8)
 
+#pragma pack(push,1)
 typedef struct
 {
-    unsigned short shortid __attribute__ ((packed));
-    struct
-    {
-        unsigned char lo __attribute__ ((packed));
-        unsigned char hi __attribute__ ((packed));
-    } len __attribute__ ((packed));
-    char        longid[8] __attribute__ ((packed));
-    struct      qdirect     header __attribute__ ((packed));
+    uint16_t    shortid;
+    uint8_t len_lo;
+    uint8_t len_hi;
+    int8_t      longid[8];
+    qdirect     header;
 } qdosextra;
+#pragma pack(pop)
 
 #ifdef USE_EF_UT_TIME
 local int GetExtraTime(struct zlist far *z, iztimes *z_utim, unsigned ut_flg);
@@ -626,7 +632,7 @@ short rev_short (ush s)
 
 #define O_BINARY 0
 
-int qlstat(char *name, struct qdirect *qs, char *flag)
+int qlstat(char *name, qdirect *qs, char *flag)
 {
     int r = -1;
     int n, fd;
@@ -637,14 +643,18 @@ int qlstat(char *name, struct qdirect *qs, char *flag)
         long dlen;
     } ntc;
 
+    assert (sizeof(qdirect) == 64);
+    assert (sizeof(qdosextra) == 76);
+
     *flag = 0;
     if((fd = open(name, O_RDONLY | O_BINARY)) > 0)
     {
         short nl;
+	int res;
 
         fstat(fd, &s);
         lseek(fd, -8, SEEK_END);
-        read(fd, &ntc, 8);
+        res = read(fd, &ntc, 8);
         qs->d_length = rev_long(s.st_size);
         qs->d_update = rev_long(s.st_ctime + 283996800);
 
@@ -833,10 +843,9 @@ int set_extra_field (struct zlist *z, iztimes *z_utim )
         if (rv == 0 || (rv == 1 && (qlflag & 2)))
         {
             lq->shortid = rev_short((short) SHORTID);
-            lq->len.lo  = (unsigned char)(EXTRALEN & 0xff);
-            lq->len.hi  = (unsigned char)(EXTRALEN >> 8);
+            lq->len_lo  = (unsigned char)(EXTRALEN & 0xff);
+            lq->len_hi  = (unsigned char)(EXTRALEN >> 8);
             strcpy(lq->longid, LONGID);
-
             memcpy(cq, lq, sizeof(qdosextra));
 
             z->ext      =   sizeof(qdosextra);

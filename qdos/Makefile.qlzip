@@ -27,13 +27,13 @@ ZIPMANUAL = MANUAL
 #   CFLAGS    flags for C compile
 #   LFLAGS1   flags after output file spec, before obj file list
 #   LFLAGS2   flags after obj file list (libraries, etc)
-CFLAGS = -O2 -fno-strength-reduce -I. -DUNIX -DQLZIP -DASM_CRC
+CFLAGS = -O2 -fno-strength-reduce -I. -DUNIX -DQLZIP
 LFLAGS1 =
-LFLAGS2 = -s
+LFLAGS2 = -s -lbz2
 
 # object file lists
 OBJZ = zip.o zipfile.o zipup.o fileio.o util.o globals.o crypt.o ttyio.o \
-       unix.o crc_gcc.o crc32.o qdos.o
+       unix.o crc32.o qdos.o
 OBJI = deflate.o trees.o
 OBJA =
 OBJU = zipfile_.o fileio_.o util_.o globals.o unix_.o
