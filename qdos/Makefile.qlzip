@@ -89,10 +89,9 @@ qdos.o: qdos/qdos.c
 crc_gcc.o: crc_i386.S			# 32bit, GNU AS
 	gcc -O3 -I. -DASM_CRC -Di386 -x assembler-with-cpp -c -o $@ crc_i386.S
 
-ZIPS = zip$E zipnote$E zipsplit$E zipcloak$E
+ZIPS = qlzip$E
 
 zips: $(ZIPS)
-zipsman: $(ZIPS) $(ZIPMANUAL)
 
 zip$E: $(OBJZ) $(OBJI) $(OBJA)
 	$(BIND) -o qlzip$E $(LFLAGS1) $(OBJZ) $(OBJI) $(OBJA) $(LFLAGS2)
@@ -109,7 +108,6 @@ $(ZIPMANUAL): man/zip.1
 # install
 install:        $(ZIPS)
 	$(INSTALL) $(ZIPS) $(BINDIR)
-	$(INSTALL) man/zip.1 $(MANDIR)/zip.$(manext)
 
 uninstall:
 	-cd $(BINDIR); rm -f $(ZIPS)
