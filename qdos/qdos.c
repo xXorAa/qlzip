@@ -639,8 +639,8 @@ int qlstat(char *name, qdirect *qs, char *flag)
     struct stat s;
     struct _ntc_
     {
-        long id;
-        long dlen;
+        uint32_t id;
+        uint32_t dlen;
     } ntc;
 
     assert (sizeof(qdirect) == 64);
@@ -666,8 +666,7 @@ int qlstat(char *name, qdirect *qs, char *flag)
         }
         qs->d_szname = rev_short(nl);
         memcpy(qs->d_name, name, nl);
-
-        if(ntc.id == *(long *)"XTcc")
+        if(ntc.id == *(uint32_t *)"XTcc")
         {
             qs->d_datalen = ntc.dlen;    /* This is big endian */
             qs->d_type = 1;
