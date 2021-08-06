@@ -1,3 +1,17 @@
+
+# To build qlzip program
+
+    make -f qdos/Makefile.qlzip
+    sudo make -f qdos/Makefile.qlzip install
+
+# To use
+
+To add an _exe that has XTcc and create the QL directory entry
+
+    qlzip -Q2 test.zip test_exe
+
+# Original README
+
 Zip 3.0 is the first Zip update adding large file support.  For now Zip 2.3x
 remains available and supported, but users should switch to this new release.
 
