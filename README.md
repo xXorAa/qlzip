@@ -1,8 +1,13 @@
 
 # To build qlzip program
+## Linux/Unix
 
     make -f qdos/Makefile.qlzip
     sudo make -f qdos/Makefile.qlzip install
+
+## WIN32 via mingw
+
+    make CC=i686-w64-mingw32-gcc -f qdos/Makefile.qlzip-mingw
 
 # To use
 
