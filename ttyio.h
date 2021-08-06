@@ -143,6 +143,12 @@
 #  define HAVE_WORKING_GETCH
 #endif /* DOS_H68_OS2_W32 */
 
+#ifdef __WIN32__
+#define echoff(f)
+#define echon()
+#define getp(a,b,c) getch(a,b,c)
+#endif
+
 #ifdef FLEXOS
 #  define echoff(f)
 #  define echon()
